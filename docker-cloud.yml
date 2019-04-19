@@ -1,0 +1,30 @@
+# Notable differences:
+# Networks aren't yet supported
+# Volume container isn't supported
+db:
+  image: 'postgres:9.4'
+lb-result:
+  image: 'dockercloud/haproxy:latest'
+  links:
+    - result-app
+  ports:
+    - '81:80'
+  roles:
+    - global
+lb-voting:
+  image: 'dockercloud/haproxy:latest'
+  links:
+    - voting-app
+  ports:
+    - '80:80'
+  roles:
+    - global
+redis:
+  image: 'redis:alpine'
+result-app:
+  image: 'docker/example-voting-app-result-app:latest'
+voting-app:
+  image: 'ilkkaanttonen/voting-app:latest'
+  target_num_containers: 2
+worker:
+  image: 'ilkkaanttonen/worker:latest'

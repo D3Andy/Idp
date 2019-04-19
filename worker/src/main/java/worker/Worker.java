@@ -53,7 +53,7 @@ class Worker {
         conn.keys("*");
         break;
       } catch (JedisConnectionException e) {
-        System.err.println("Waiting for redis");
+        System.err.println("Failed to connect to redis - retrying");
         sleep(1000);
       }
     }
@@ -74,7 +74,7 @@ class Worker {
         try {
           conn = DriverManager.getConnection(url, "postgres", "");
         } catch (SQLException e) {
-          System.err.println("Waiting for db");
+          System.err.println("Failed to connect to db - retrying");
           sleep(1000);
         }
       }
@@ -88,7 +88,6 @@ class Worker {
       System.exit(1);
     }
 
-    System.err.println("Connected to db");
     return conn;
   }
 
