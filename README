@@ -1,1 +1,27 @@
+docker-machine create --driver virtualbox nume // creeare container
+
+docker-machine start nume //pentru pornire container
+docker-machine ssh nume // conectare la container
+
+docker swarm init --advertise-addr 192.168.99.100 //deschidere swarm
+docker swarm leave --force
+docker stack deploy -c docker-stack.yml voting-app
+docker swarm leave --force ; docker swarm init ; docker stack deploy -c docker-stack.yml voting-app
+
+docker node ls
+
+docker stack ls
+docker stack services voting-app
+docker service update --force [id]
+
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+
+
+Push image 
+docker build -t d3andy/voting-app:latest . //creeat imagine
+docker tag vote d3andy/voting-app:latest
+docker push d3andy/voting-app:latest
+
+docker build -t d3andy/voting-app:latest .;docker push d3andy/voting-app:latest
 
