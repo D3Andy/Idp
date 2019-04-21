@@ -25,7 +25,13 @@ namespace Worker
                 var keepAliveCommand = pgsql.CreateCommand();
                 keepAliveCommand.CommandText = "SELECT 1";
 
-                var definition = new { vote = "", voter_id = "" };
+                var definition = new { voter_id = "" , 
+					name_id = "" ,
+					budget = "" ,
+					roadtype = "" ,
+					height = "" ,
+					way = "" ,
+					fit = "" ,};
                 while (true)
                 {
                     // Slow down to prevent CPU spike, only query each 100ms
@@ -41,7 +47,7 @@ namespace Worker
                     if (json != null)
                     {
                         var vote = JsonConvert.DeserializeAnonymousType(json, definition);
-                        Console.WriteLine($"Processing vote for '{vote.vote}' by '{vote.voter_id}'");
+                        Console.WriteLine($"Processing vote by '{vote.voter_id}'");
                         // Reconnect DB if down
                         if (!pgsql.State.Equals(System.Data.ConnectionState.Open))
                         {
@@ -50,7 +56,8 @@ namespace Worker
                         }
                         else
                         { // Normal +1 vote requested
-                            UpdateVote(pgsql, vote.voter_id, vote.vote);
+                            UpdateVote(pgsql, vote.voter_id, vote.name_id, vote.budget
+						,vote.roadtype, vote.height, vote.way, vote.fit);
                         }
                     }
                     else
@@ -95,7 +102,12 @@ namespace Worker
             var command = connection.CreateCommand();
             command.CommandText = @"CREATE TABLE IF NOT EXISTS votes (
                                         id VARCHAR(255) NOT NULL UNIQUE,
-                                        vote VARCHAR(255) NOT NULL
+                                        name_id VARCHAR(255) NOT NULL,
+					budget VARCHAR(255) NOT NULL,
+					roadtype VARCHAR(255) NOT NULL,
+					height VARCHAR(255) NOT NULL,
+					way VARCHAR(255) NOT NULL,
+					fit VARCHAR(255) NOT NULL,
                                     )";
             command.ExecuteNonQuery();
 
@@ -130,14 +142,28 @@ namespace Worker
                 .First(a => a.AddressFamily == AddressFamily.InterNetwork)
                 .ToString();
 
-        private static void UpdateVote(NpgsqlConnection connection, string voterId, string vote)
+        private static void UpdateVote(NpgsqlConnection connection, string voterId,
+						string name_id, string budget,
+						string roadtype, string height,
+						string way, string fit)
         {
             var command = connection.CreateCommand();
             try
             {
-                command.CommandText = "INSERT INTO votes (id, vote) VALUES (@id, @vote)";
+			name_id = "" ,
+			budget = "" ,
+			roadtype = "" ,
+			height = "" ,
+			way = "" ,
+			fit = "" ,
+                command.CommandText = "INSERT INTO votes (id, name_id, budget, roadtype, height, way,fit) VALUES (@id, @name_id, @budget, @roadtype, @height, @way, @fit)";
                 command.Parameters.AddWithValue("@id", voterId);
-                command.Parameters.AddWithValue("@vote", vote);
+                command.Parameters.AddWithValue("@name_id", name_id);
+		command.Parameters.AddWithValue("@budget", budget);
+                command.Parameters.AddWithValue("@roadtype", roadtype);
+		command.Parameters.AddWithValue("@height", height);
+                command.Parameters.AddWithValue("@way", way);
+		command.Parameters.AddWithValue("@fit", fit);
                 command.ExecuteNonQuery();
             }
             catch (DbException)

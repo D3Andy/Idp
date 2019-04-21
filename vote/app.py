@@ -37,8 +37,20 @@ def hello():
 
     if request.method == 'POST':
         redis = get_redis()
-        vote = request.form['vote']
-        data = json.dumps({'voter_id': voter_id, 'vote': vote})
+        name_id = request.form['name_id']
+	budget = request.form['budget']
+	roadtype = request.form['roadtype']
+	height = request.form['height']
+	way = request.form['way']
+	fit = request.form['fit']
+        data = json.dumps({'voter_id': voter_id,
+				'name_id': name_id,
+				'budget': budget,
+				'roadtype': roadtype,
+				'height': height,
+				'way': way,
+				'fit': fit,
+				})
         redis.rpush('votes', data)
 
     resp = make_response(render_template(
