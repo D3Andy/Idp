@@ -24,4 +24,6 @@ docker tag vote d3andy/voting-app:latest
 docker push d3andy/voting-app:latest
 
 docker build -t d3andy/voting-app:latest .;docker push d3andy/voting-app:latest
+docker build -t d3andy/worker:latest .;docker push d3andy/worker:latest
+docker build -t d3andy/result:latest .;docker push d3andy/result:latest
 
